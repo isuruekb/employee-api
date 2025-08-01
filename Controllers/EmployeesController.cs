@@ -15,51 +15,51 @@ namespace EmployeeApi.Controllers
             _service = service;
         }
 
-        // GET /api/employees - get all employees
         [HttpGet]
         public ActionResult<List<Employee>> GetAll() => _service.GetAll();
 
-        // GET /api/employees/{id} - get employee by ID
         [HttpGet("{id}")]
         public ActionResult<Employee> GetById(int id)
         {
             var employee = _service.GetById(id);
-            if (employee == null) return NotFound();
-            return Ok(employee);
+            if (employee == null)
+                return NotFound(new { Message = $"Employee with ID {id} not found" });
+
+            return Ok(employee); // 200 OK
         }
 
-        // POST /api/employees - create a new employee
         [HttpPost]
         public ActionResult<Employee> Create([FromBody] Employee employee)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+                return BadRequest(ModelState); // 400
 
             var created = _service.Add(employee);
-            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created); // 201
         }
 
-
-        // PUT /api/employees/{id} - update an existing employee
         [HttpPut("{id}")]
         public IActionResult Update(int id, [FromBody] Employee employee)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+                return BadRequest(ModelState); // 400
 
             var success = _service.Update(id, employee);
-            if (!success) return NotFound();
+            if (!success)
+                return NotFound(new { Message = $"Employee with ID {id} not found" }); // 404
 
-            return NoContent();
+            return NoContent(); // 204
         }
 
-        // DELETE /api/employees/{id} - delete an employee
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
             var success = _service.Delete(id);
-            if (!success) return NotFound();
-            return Ok();
+            if (!success)
+                return NotFound(new { Message = $"Employee with ID {id} not found" }); // 404
+
+            return NoContent(); // 204
         }
+
     }
 }
