@@ -30,19 +30,27 @@ namespace EmployeeApi.Controllers
 
         // POST /api/employees - create a new employee
         [HttpPost]
-        public ActionResult<Employee> Create(Employee employee)
+        public ActionResult<Employee> Create([FromBody] Employee employee)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var created = _service.Add(employee);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
+
         // PUT /api/employees/{id} - update an existing employee
         [HttpPut("{id}")]
-        public IActionResult Update(int id, Employee employee)
+        public IActionResult Update(int id, [FromBody] Employee employee)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var success = _service.Update(id, employee);
             if (!success) return NotFound();
-            return Ok();
+
+            return NoContent();
         }
 
         // DELETE /api/employees/{id} - delete an employee
